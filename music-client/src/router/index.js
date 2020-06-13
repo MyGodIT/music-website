@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import LoginIn from '@/pages/LoginIn'
-import LoginUp from '@/pages/LoginUp'
+import SignUp from '@/pages/SignUp'
 import Home from '@/pages/Home'
 import SongList from '@/pages/SongList'
 import Singer from '@/pages/Singer'
@@ -9,8 +9,7 @@ import MyMusic from '@/pages/MyMusic'
 import SongListAlbum from '@/pages/SongListAlbum'
 import SingerAlbum from '@/pages/SingerAlbum'
 import Search from '@/pages/Search'
-import Info from '@/pages/Info'
-import UpLoad from '@/pages/UpLoad'
+import Setting from '@/pages/Setting'
 import Lyric from '@/pages/Lyric'
 
 Vue.use(Router)
@@ -26,17 +25,17 @@ export default new Router({
       component: resolve => require(['../pages/404.vue'], resolve)
     },
     {
-      path: '/',
+      path: '/login-in',
       name: 'login-in',
       component: LoginIn
     },
     {
-      path: '/login-up',
-      name: 'login-up',
-      component: LoginUp
+      path: '/sign-up',
+      name: 'sign-up',
+      component: SignUp
     },
     {
-      path: '/home',
+      path: '/',
       name: 'home',
       component: Home
     },
@@ -76,14 +75,12 @@ export default new Router({
       component: Search
     },
     {
-      path: '/info',
-      name: 'info',
-      component: Info
-    },
-    {
-      path: '/upLoad',
-      name: 'upLoad',
-      component: UpLoad
+      path: '/setting',
+      name: 'setting',
+      component: Setting
     }
-  ]
+  ],
+  scrollBehavior (to, from, savedPosition) {
+    return { x: 0, y: 0 }
+  }
 })

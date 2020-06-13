@@ -21,18 +21,6 @@ export default {
 }
 </script>
 
-<style scoped>
-.the-footer{
-  width: 100%;
-  background-color: white;
-  height: 180px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
-
-.the-footer p {
-  height: 30px;
-}
+<style lang="scss" scoped>
+@import '../assets/css/the-footer.scss';
 </style>

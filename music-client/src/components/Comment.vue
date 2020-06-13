@@ -43,6 +43,7 @@
 <script>
 import {mixin} from '../mixins'
 import { mapGetters } from 'vuex'
+import { getUserOfId, setComment, setLike, getAllComment } from '../api/index'
 
 export default {
   name: 'comment',
@@ -79,10 +80,10 @@ export default {
   methods: {
     // 获取所有评论
     getComment () {
-      this.$api.commentAPI.getAllComment(this.type, this.playId)
+      getAllComment(this.type, this.playId)
         .then(res => {
-          this.commentList = res.data
-          for (let item of res.data) {
+          this.commentList = res
+          for (let item of res) {
             this.getUsers(item.userId)
           }
         })
@@ -92,10 +93,10 @@ export default {
     },
     // 获取评论用户的昵称和头像
     getUsers (id) {
-      this.$api.userAPI.getUserOfId(id)
+      getUserOfId(id)
         .then(res => {
-          this.userPic.push(res.data[0].avator)
-          this.userName.push(res.data[0].username)
+          this.userPic.push(res[0].avator)
+          this.userName.push(res[0].username)
         })
         .catch(err => {
           console.log(err)
@@ -104,9 +105,19 @@ export default {
     // 提交评论
     postComment () {
       if (this.loginIn) {
-        this.$api.commentAPI.setComment(this.type, this.playId, this.userId, this.textarea)
+        // 0 代表歌曲， 1 代表歌单
+        let params = new URLSearchParams()
+        if (this.type === 1) {
+          params.append('songListId', this.playId)
+        } else if (this.type === 0) {
+          params.append('songId', this.playId)
+        }
+        params.append('userId', this.userId)
+        params.append('type', this.type)
+        params.append('content', this.textarea)
+        setComment(params)
           .then(res => {
-            if (res.data.code === 1) {
+            if (res.code === 1) {
               this.textarea = ''
               this.getComment()
               this.notify('评论成功', 'success')
@@ -124,9 +135,12 @@ export default {
     // 点赞
     postUp (id, up, index) {
       if (this.loginIn) {
-        this.$api.commentAPI.setLike(id, up)
+        let params = new URLSearchParams()
+        params.append('id', id)
+        params.append('up', up + 1)
+        setLike(params)
           .then(res => {
-            if (res.data.code === 1) {
+            if (res.code === 1) {
               this.$refs.up[index].children[0].style.color = '#2796dd'
               this.getComment()
             }
@@ -142,72 +156,6 @@ export default {
 }
 </script>
 
-<style scoped>
-  /*评论*/
-  .comment h2 {
-    margin-bottom: 20px;
-    text-align: center;
-    height: 50px;
-    line-height: 50px;
-    border-bottom: 1px solid black;
-  }
-  .comment-msg {
-    display: flex;
-    flex-direction: row;
-  }
-  .comment-img {
-    width: 70px;
-  }
-  .comment-img img {
-    width: 100%;
-  }
-  .comment-input {
-    margin-left: 10px;
-    flex: 1;
-  }
-  .sub-btn{
-    margin-top: 10px;
-    margin-left: 90%;
-  }
-  /*热门评论*/
-  .popular {
-    width: 100%;
-  }
-  .popular > li{
-    border-bottom: solid 1px rgba(0, 0, 0, 0.1);
-    padding: 15px 0;
-    display: flex;
-    flex-direction: row;
-  }
-  .popular-img {
-    width: 50px;
-  }
-  .popular-img img {
-    width: 100%;
-  }
-  .popular-msg {
-    padding: 0 20px;
-    flex: 1;
-  }
-  .popular-msg li {
-    width: 100%;
-  }
-  .popular-msg .time {
-    font-size: .6rem;
-    color: rgba(0, 0, 0, 0.5);
-  }
-  .popular-msg .content {
-    font-size: 1rem;
-  }
-  .up {
-    width: 50px;
-    line-height: 60px;
-  }
-  .icon {
-    width: 1em;
-    height: 1em;
-    fill: currentColor;
-    color: black;
-    font-size: 1.5em;
-  }
+<style lang="scss" scoped>
+@import '../assets/css/comment.scss';
 </style>

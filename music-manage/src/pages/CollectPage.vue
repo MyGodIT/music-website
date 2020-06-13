@@ -25,7 +25,7 @@
         <el-table-column prop="name" label="歌手-歌曲"></el-table-column>
         <el-table-column label="操作" width="85">
           <template slot-scope="scope">
-            <el-button size="mini" type="danger" @click="handleDelete(scope.row.id)">删除</el-button>
+            <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -44,6 +44,7 @@
 
 <script>
 import { mixin } from '../mixins'
+import { getCollectionOfUser, deleteCollection, getSongOfId } from '../api/index'
 
 export default {
   name: 'collect-page',
@@ -80,10 +81,10 @@ export default {
   methods: {
     // 通过用户id获取用户收藏的歌曲id
     getData () {
-      this.$api.collectionAPI.getCollectionOfUser(this.$route.query.id)
+      getCollectionOfUser(this.$route.query.id)
         .then(res => {
           this.tableData = []
-          for (let item of res.data) {
+          for (let item of res) {
             this.getSongList(item.songId)
           }
         })
@@ -93,10 +94,10 @@ export default {
     },
     // 通过歌曲ID获取歌曲
     getSongList (id) {
-      this.$api.songAPI.getSongOfId(id)
+      getSongOfId(id)
         .then(res => {
-          this.tableData.push(res.data[0])
-          this.tempDate.push(res.data[0])
+          this.tableData.push(res[0])
+          this.tempDate.push(res[0])
         })
         .catch(err => {
           console.log(err)
@@ -104,9 +105,9 @@ export default {
     },
     // 删除一首歌曲
     deleteRow () {
-      this.$api.collectionAPI.deleteCollection(this.idx)
+      deleteCollection(this.$route.query.id, this.idx.id)
         .then(res => {
-          if (res.data) {
+          if (res) {
             this.getData()
             this.notify('删除成功', 'success')
           } else {

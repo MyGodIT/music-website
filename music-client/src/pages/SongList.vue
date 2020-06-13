@@ -1,16 +1,14 @@
 <template>
   <div class="song-list">
-    <div class="song-list-header">
-      <ul>
-        <li
-          v-for="(item, index) in songStyle"
-          :key="index"
-          :class="{active: item.name === activeName}"
-          @click="handleChangeView(item.name)">
-          {{item.name}}
-        </li>
-      </ul>
-    </div>
+    <ul class="song-list-header">
+      <li
+        v-for="(item, index) in songStyle"
+        :key="index"
+        :class="{active: item.name === activeName}"
+        @click="handleChangeView(item.name)">
+        {{item.name}}
+      </li>
+    </ul>
     <div class="song-content">
       <content-list :contentList="data"></content-list>
       <div class="pagination">
@@ -31,6 +29,7 @@
 import ContentList from '../components/ContentList'
 import { mapGetters } from 'vuex'
 import { songStyle } from '../assets/data/songList'
+import { getSongList, getSongListOfStyle } from '../api/index'
 
 export default {
   name: 'song-list',
@@ -76,10 +75,10 @@ export default {
     },
     // 获取全部歌单
     getSongList (page) {
-      this.$api.songListAPI.getSongList()
+      getSongList()
         .then(res => {
           this.currentPage = 1
-          this.albumDatas = res.data
+          this.albumDatas = res
         })
         .catch(err => {
           console.log(err)
@@ -87,10 +86,10 @@ export default {
     },
     // 通过类别获取歌单
     getSongListOfStyle (style) {
-      this.$api.songListAPI.getSongListOfStyle(style)
+      getSongListOfStyle(style)
         .then(res => {
           this.currentPage = 1
-          this.albumDatas = res.data
+          this.albumDatas = res
         })
         .catch(err => {
           console.log(err)
@@ -100,38 +99,6 @@ export default {
 }
 </script>
 
-<style scoped>
-.song-list {
-  margin: 30px 150px;
-  padding-bottom: 50px;
-  min-width: 800px;
-  background-color: #ffffff;
-}
-
-.song-list-header {
-  width: 100%;
-  padding: 0 40px;
-}
-
-li {
-  display: inline-block;
-  line-height: 40px;
-  margin: 40px 20px 15px 20px;
-  font-size: 20px;
-  font-weight: 400;
-  color: #67757f;
-  border-bottom: none;
-  cursor: pointer;
-}
-
-.active {
-  color: black;
-  font-weight: 600;
-  border-bottom: 4px solid black;
-}
-
-.pagination {
-  display: flex;
-  justify-content: center;
-}
+<style lang="scss" scoped>
+@import '../assets/css/song-list.scss';
 </style>

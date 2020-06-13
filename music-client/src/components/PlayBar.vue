@@ -1,6 +1,6 @@
 <template>
   <div class="play-bar" :class="{show:!toggle}">
-    <div @click="toggle=!toggle" class="item-up" :class="{turn:toggle}">
+    <div @click="toggle=!toggle" class="item-up" :class="{turn: toggle}">
       <svg class="icon" aria-hidden="true">
         <use xlink:href="#icon-jiantou-xia-cuxiantiao"></use>
       </svg>
@@ -42,7 +42,7 @@
             <div ref="bg" class="bg" @click="updatemove">
               <div ref="curProgress" class="cur-progress" :style="{width: curLength+'%'}"></div>
             </div>
-              <!--进度条 end -->
+            <!--进度条 end -->
             <!--拖动的点点-->
             <div ref="idot" class="idot" :style="{left: curLength+'%'}" @mousedown="mousedown" @mouseup="mouseup"></div>
             <!--拖动的点点 end -->
@@ -51,13 +51,21 @@
         <!--播放结束时间-->
         <div class="left-time">{{ songTime }}</div>
       </div>
+      <!--音量-->
+      <div class="item icon-volume" >
+        <svg v-if="volume !== 0" class="icon" aria-hidden="true">
+          <use xlink:href="#icon-yinliang1"></use>
+        </svg>
+        <svg v-else class="icon" aria-hidden="true">
+          <use xlink:href="#icon-yinliangjingyinheix"></use>
+        </svg>
+        <el-slider class="volume" v-model="volume" :vertical="true"></el-slider>
+      </div>
       <!--添加-->
       <div class="item" @click="collection">
-        <el-button plain style="border: 0;">
-          <svg class="icon" aria-hidden="true">
-            <use xlink:href="#icon-xihuan-shi"></use>
-          </svg>
-        </el-button>
+        <svg :class="{ active: isActive }" class="icon" aria-hidden="true">
+          <use xlink:href="#icon-xihuan-shi"></use>
+        </svg>
       </div>
       <!--下载-->
       <div class="item" @click="download">
@@ -78,6 +86,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { mixin } from '../mixins'
+import { setCollection, download } from '../api/index'
 
 export default {
   name: 'play-bar',
@@ -90,7 +99,8 @@ export default {
       curLength: 0, // 进度条的位置
       progressLength: 0, // 进度条长度
       mouseStartX: 0, // 拖拽开始位置
-      toggle: true
+      toggle: true,
+      volume: 50
     }
   },
   computed: {
@@ -109,7 +119,8 @@ export default {
       'listOfSongs', // 当前歌单列表
       'listIndex', // 当前歌曲在歌曲列表的位置
       'showAside', // 是否显示侧边栏
-      'autoNext' // 用于触发自动播放下一首
+      'autoNext', // 用于触发自动播放下一首
+      'isActive'
     ])
   },
   watch: {
@@ -120,6 +131,9 @@ export default {
       } else {
         this.$store.commit('setPlayButtonUrl', '#icon-bofang')
       }
+    },
+    volume () {
+      this.$store.commit('setVolume', this.volume / 100)
     },
     // 播放时间的开始和结束
     curTime () {
@@ -136,18 +150,28 @@ export default {
   },
   mounted () {
     this.progressLength = this.$refs.progress.getBoundingClientRect().width
+    document.querySelector('.icon-volume').addEventListener('click', function (e) {
+      document.querySelector('.volume').classList.add('show-volume')
+      e.stopPropagation()
+    }, false)
+    document.querySelector('.volume').addEventListener('click', function (e) {
+      e.stopPropagation()
+    }, false)
+    document.addEventListener('click', function () {
+      document.querySelector('.volume').classList.remove('show-volume')
+    }, false)
   },
   methods: {
     // 下载
     download () {
-      this.$api.songAPI.download(this.url)
+      download(this.url)
         .then(res => {
           let content = res.data
-          var eleLink = document.createElement('a')
+          let eleLink = document.createElement('a')
           eleLink.download = `${this.artist}-${this.title}.mp3`
           eleLink.style.display = 'none'
           // 字符内容转变成blob地址
-          var blob = new Blob([content])
+          let blob = new Blob([content])
           eleLink.href = URL.createObjectURL(blob)
           // 触发点击
           document.body.appendChild(eleLink)
@@ -299,12 +323,16 @@ export default {
     },
     collection () {
       if (this.loginIn) {
-        // 0 代表歌曲， 1 代表歌单
-        this.$api.collectionAPI.setCollection(this.userId, 0, this.id)
+        var params = new URLSearchParams()
+        params.append('userId', this.userId)
+        params.append('type', 0) // 0 代表歌曲， 1 代表歌单
+        params.append('songId', this.id)
+        setCollection(params)
           .then(res => {
-            if (res.data.code === 1) {
+            if (res.code === 1) {
+              this.$store.commit('setIsActive', true)
               this.notify('收藏成功', 'success')
-            } else if (res.data.code === 2) {
+            } else if (res.code === 2) {
               this.notify('已收藏', 'warning')
             } else {
               this.$notify.error({
@@ -324,118 +352,6 @@ export default {
 }
 </script>
 
-<style scoped>
-.play-bar{
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  transition: all .5s;
-  box-shadow: 0 0 10px black;
-}
-
-.item-up {
-  position: absolute;
-  bottom: 70px;
-  left: 20px;
-  cursor: pointer;
-}
-
-.kongjian {
-  bottom: 0;
-  height: 60px;
-  width: 100%;
-  background-color: #fefefe;
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: center;
-  align-items: center;
-  min-width: 1000px;
-}
-
-.show {
-  bottom: -60px;
-}
-
-.turn{
-  transform: rotate(180deg);
-}
-
-.item{
-  width: 80px;
-  height: 50px;
-  line-height: 60px;
-  text-align: center;
-  cursor: pointer;
-}
-
-.item-img {
-  width: 50px;
-  height: 50px;
-}
-
-.item-img img {
-  width: 100%;
-}
-
-.item-song-title {
-  display: flex;
-  justify-content: space-between;
-  height: 20px;
-  line-height: 10px;
-}
-
-.playing-speed {
-  height: 50px;
-  width: 600px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.playing-speed .current-time,
-.playing-speed .left-time {
-  width: 70px;
-  text-align: center;
-  font-size: 13px;
-  color:black;
-  font-weight: 500;
-  top: -10px;
-}
-
-.playing-speed .progress-box {
-  flex: 1;
-}
-
-.playing-speed .progress-box .progress {
-  width: 100%;
-  background: #a9dbf9;
-  height: 6px;
-}
-
-.bg {
-  height: 100%;
-}
-
-.cur-progress {
-  height: 100%;
-  background: #30a4fc;
-}
-
-.playing-speed>.progress-box .idot {
-  width: 16px;
-  height: 16px;
-  position: relative;
-  border-radius: 50%;
-  background-color: black;
-  top: -11px;
-  vertical-align: middle;
-}
-
-.icon {
-  width: 1em;
-  height: 1em;
-  fill: currentColor;
-  color: black;
-  font-size: 1.5em;
-}
+<style lang="scss" scoped>
+@import '../assets/css/play-bar.scss';
 </style>

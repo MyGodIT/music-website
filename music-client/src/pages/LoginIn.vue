@@ -13,8 +13,8 @@
         <el-input type="password" placeholder="密码" v-model="loginForm.password" @keyup.enter.native="loginIn"></el-input>
       </el-form-item>
       <div class="login-btn">
-        <el-button @click="goLoginUp()">注册</el-button>
-        <el-button type="primary" @click="loginIn">登录</el-button>
+        <el-button @click="goSignUp()">注册</el-button>
+        <el-button type="primary" @click="handleleLoginIn">登录</el-button>
       </div>
     </el-form>
   </div>
@@ -24,6 +24,7 @@
 <script>
 import { mixin } from '../mixins'
 import LoginLogo from '../components/LoginLogo'
+import { loginIn } from '../api/index'
 
 export default {
   name: 'login-in',
@@ -32,14 +33,14 @@ export default {
   },
   mixins: [mixin],
   data: function () {
-    var validateName = (rule, value, callback) => {
+    let validateName = (rule, value, callback) => {
       if (!value) {
         return callback(new Error('用户名不能为空'))
       } else {
         callback()
       }
     }
-    var validatePassword = (rule, value, callback) => {
+    let validatePassword = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请输入密码'))
       } else {
@@ -68,18 +69,24 @@ export default {
     changeIndex (value) {
       this.$store.commit('setActiveName', value)
     },
-    loginIn () {
+    handleleLoginIn () {
       let _this = this
-      _this.$api.userAPI.loginIn(this.loginForm.username, this.loginForm.password)
+      let params = new URLSearchParams()
+      params.append('username', this.loginForm.username)
+      params.append('password', this.loginForm.password)
+      loginIn(params)
         .then(res => {
           // console.log('-----------获取登录信息---------------')
-          if (res.data.code === 1) {
-            _this.notify('登录成功', 'success')
-            _this.setUserMsg(res.data.userMsg[0])
+          if (res.code === 1) {
+            _this.$message({
+              message: '登录成功',
+              type: 'success'
+            })
+            _this.setUserMsg(res.userMsg[0])
             _this.$store.commit('setLoginIn', true)
             setTimeout(function () {
               _this.changeIndex('首页')
-              _this.$router.push({path: '/home'})
+              _this.$router.push({path: '/'})
               _this.$router.go(0)
             }, 2000)
           } else {
@@ -93,39 +100,13 @@ export default {
       this.$store.commit('setUsername', item.username)
       this.$store.commit('setAvator', item.avator)
     },
-    goLoginUp () {
-      this.$router.push({path: '/login-up'})
+    goSignUp () {
+      this.$router.push({path: '/sign-up'})
     }
   }
 }
 </script>
 
-<style scoped>
-.login{
-  position: absolute;
-  margin-left: 800px;
-  top: 150px;
-  padding: 30px 50px;
-  width: 300px;
-  background-color: white;
-  height: 210px;
-  border-radius: 10px;
-}
-
-.login-head {
-  text-align: center;
-  margin-bottom: 10px;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.login-btn {
-  display: flex;
-  justify-content: space-between;
-}
-
-.login-btn button{
-  display: block;
-  width: 50%;
-}
+<style lang="scss" scoped>
+@import '../assets/css/login-in.scss';
 </style>

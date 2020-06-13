@@ -1,7 +1,7 @@
 // 左侧导航栏
 const navMsg = [{
   name: '首页',
-  path: '/home'
+  path: '/'
 }, {
   name: '歌单',
   path: '/song-list'
@@ -16,19 +16,16 @@ const navMsg = [{
 // 右侧导航栏
 const loginMsg = [{
   name: '登录',
-  path: '/'
+  path: '/login-in'
 }, {
   name: '注册',
-  path: '/login-up'
+  path: '/sign-up'
 }]
 
 // 用户下拉菜单项
 const menuList = [{
-  name: '个人信息',
-  path: '/info'
-}, {
-  name: '修改头像',
-  path: '/upLoad'
+  name: '设置',
+  path: '/setting'
 }, {
   name: '退出',
   path: 0

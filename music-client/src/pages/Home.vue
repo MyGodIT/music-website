@@ -4,7 +4,7 @@
     <swiper/>
     <!--热门歌单/歌手-->
     <div class="section" v-for="(item, index) in songsList" :key="index">
-      <div class="section-head">{{item.name}}</div>
+      <div class="section-title">{{item.name}}</div>
       <content-list :contentList="item.list"></content-list>
     </div>
   </div>
@@ -13,6 +13,7 @@
 <script>
 import Swiper from '../components/Swiper'
 import ContentList from '../components/ContentList'
+import { getSongList, getAllSinger } from '../api/index'
 
 export default {
   name: 'home',
@@ -36,19 +37,18 @@ export default {
   },
   methods: {
     getSongList (path) {
-      this.$api.songListAPI.getSongList()
+      getSongList()
         .then(res => {
-          this.songsList[0].list = res.data.slice(0, 10)
+          this.songsList[0].list = res.slice(0, 10)
         })
         .catch(err => {
           console.log(err)
         })
     },
     getSinger () {
-      this.$api.singerAPI.getAllSinger()
-        .then(res => {
-          this.songsList[1].list = res.data.slice(0, 10)
-        })
+      getAllSinger().then(res => {
+        this.songsList[1].list = res.slice(0, 10)
+      })
         .catch(err => {
           console.log(err)
         })
@@ -57,24 +57,6 @@ export default {
 }
 </script>
 
-<style scoped>
-div {
-  box-sizing: border-box;
-}
-
-.section {
-  width: 100%;
-  margin-bottom: 80px;
-  padding: 0 120px 50px 120px;
-  background-color: #ffffff;
-}
-
-.section-head {
-  height: 100px;
-  font-size: 28px;
-  font-weight: 500;
-  text-align: center;
-  line-height: 100px;
-  color: black;
-}
+<style lang="scss" scoped>
+@import '../assets/css/home.scss';
 </style>
