@@ -1,20 +1,19 @@
 <template>
   <div id="app">
-    <song-audio />
     <router-view></router-view>
   </div>
 </template>
 
-<script>
-import SongAudio from './components/SongAudio'
+<script lang="ts" setup>
+import { getCurrentInstance } from "vue";
 
-export default {
-  name: 'App',
-  components: {
-    SongAudio
-  }
+const { proxy } = getCurrentInstance();
+
+if (sessionStorage.getItem("dataStore")) {
+  proxy.$store.replaceState(Object.assign({}, proxy.$store.state, JSON.parse(sessionStorage.getItem("dataStore"))));
 }
-</script>
 
-<style>
-</style>
+window.addEventListener("beforeunload", () => {
+  sessionStorage.setItem("dataStore", JSON.stringify(proxy.$store.state));
+});
+</script>

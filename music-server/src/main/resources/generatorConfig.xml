@@ -21,7 +21,7 @@
     </javaTypeResolver>
 
     <!-- 实体类生成的位置 -->
-    <javaModelGenerator targetPackage="com.example.demo.domain" targetProject="src/main/java">
+    <javaModelGenerator targetPackage="com.example.yin.domain" targetProject="src/main/java">
       <property name="enableSubPackages" value="true"/>
       <property name="trimStrings" value="true"/>
     </javaModelGenerator>
@@ -32,7 +32,7 @@
     </sqlMapGenerator>
 
     <!-- Mapper 接口文件的位置 -->
-    <javaClientGenerator targetPackage="com.example.demo.dao" targetProject="src/main/java" type="XMLMAPPER">
+    <javaClientGenerator targetPackage="com.example.yin.dao" targetProject="src/main/java" type="XMLMAPPER">
       <property name="enableSubPackages" value="false"/>
     </javaClientGenerator>
 
@@ -42,7 +42,7 @@
     <table tableName="comment" domainObjectName="Comment" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false"/>
     <table tableName="consumer" domainObjectName="Consumer" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false"/>
     <table tableName="list_song" domainObjectName="ListSong" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false"/>
-    <table tableName="rank" domainObjectName="Rank" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false"/>
+    <table tableName="rank_list" domainObjectName="RankList" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false"/>
     <table tableName="singer" domainObjectName="Singer" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false"/>
     <table tableName="song" domainObjectName="Song" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false"/>
     <table tableName="song_list" domainObjectName="SongList" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false"/>
